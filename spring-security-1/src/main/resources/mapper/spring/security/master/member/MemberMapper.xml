@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.security.master.member.mapper.MemberMapper">
+
+    <!-- 회원 시스템: Member Result Map -->
+    <resultMap id="memberResultMap" type="MemberDTO">
+        <id property="id"        column="id"/>
+        <result property="password" column="password"/>
+        <collection property="roleNames" ofType="java.lang.String">
+            <result column="roleNames"/>
+        </collection>
+    </resultMap>
+
+    <!-- 회원 시스템: 회원 [조회] -->
+    <select id="findMemberById"
+            resultMap="memberResultMap"
+            parameterType="java.lang.String">
+        SELECT
+                member.id           AS "id",
+                member.password     AS "password",
+                role.role_name      AS "roleNames"
+        FROM member
+        INNER JOIN role ON role.id = member.id
+        WHERE 1 = 1
+        AND member.use_yn = 'Y'
+        AND role.use_yn = 'Y'
+        AND member.id = #{id}
+    </select>
+
+    <!-- 회원 시스템: 회원 [가입] -->
+    <insert id="createMember"
+            parameterType="CreateMemberDTO"
+            keyProperty="memberID"
+            useGeneratedKeys="true">
+        <selectKey keyProperty="memberID" resultType="int" order="BEFORE">
+            SELECT nextval('member_member_id_seq') AS memberID
+        </selectKey>
+        INSERT INTO member
+        (
+            member_id,
+            id,
+            password,
+            create_date,
+            update_date,
+            use_yn
+        )
+        VALUES
+        (
+            #{memberID},
+            #{id},
+            #{password},
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP,
+            'Y'
+        )
+        RETURNING member_id AS memberID
+    </insert>
+
+    <!-- 회원 시스템: 회원 [권한] 생성 -->
+    <insert id="createRole"
+            parameterType="createRoleDTO"
+            keyProperty="roleID"
+            useGeneratedKeys="true">
+        <selectKey keyProperty="roleID" resultType="int" order="BEFORE">
+            SELECT nextval('role_role_id_seq') AS roleID
+        </selectKey>
+        INSERT INTO role
+        (
+            role_id,
+            id,
+            role_name,
+            create_date,
+            update_date,
+            use_yn
+        )
+        VALUES
+        (
+            #{roleID},
+            #{id},
+            #{roleName},
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP,
+            'Y'
+        )
+        RETURNING role_id AS roleID
+    </insert>
+
+</mapper>
