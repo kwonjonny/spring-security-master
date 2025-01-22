@@ -62,7 +62,7 @@
 - Java: 17
 - Redis: 6.x 이상
 - PostgreSQL: 14.x 이상
-- Spring Boot: 3.3.5
+- Spring Boot: 3.4.1
 
 ### 2. **프로젝트 실행**
 ```bash
